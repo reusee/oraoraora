@@ -6,16 +6,9 @@ package main
 #cgo pkg-config: gtk+-3.0 webkit2gtk-3.0
 */
 import "C"
-import (
-	"fmt"
-	"runtime"
-)
+import "fmt"
 
 var p = fmt.Printf
-
-func init() {
-	runtime.GOMAXPROCS(32)
-}
 
 func main() {
 	// init gtk
@@ -50,11 +43,6 @@ func main() {
 
 		C.gtk_notebook_append_page(asNotebook(pages), view.Widget, label)
 
-		// ready to show
-		connect(view.View, "ready-to-show", func() {
-			C.gtk_widget_show_all(view.Widget)
-		})
-
 		// new view is requested
 		connect(view.View, "create", func() *C.GtkWidget {
 			return newView().Widget
@@ -71,11 +59,6 @@ func main() {
 				title += string(r)
 			}
 			C.gtk_label_set_markup(asLabel(label), toGStr(fmt.Sprintf(`<span font="10">%s</span>`, title)))
-		})
-
-		// page load state changed
-		connect(view.View, "load-changed", func(_, ev interface{}) {
-			p("load changed %d\n", ev.(int))
 		})
 
 		return view
